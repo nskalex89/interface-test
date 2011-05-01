@@ -11,7 +11,7 @@ $(document).ready(function() {
         [8, 1]
     ];
 
-    $.plot($("#placeholder"), [
+    $.plot($("#chart1"), [
         { data: d1, color: "green" }
     ],
     {
