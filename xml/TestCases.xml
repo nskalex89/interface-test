@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<TestCases>
+  <Case id="1" failureBehaviour="StayInCurrentVertex" failureDistribution="Normal" timeDistribution="Normal" />
+  <Case id="2" failureBehaviour="GoToFirstVertex" failureDistribution="Normal" time="5" />
+  <Case id="3" failureBehaviour="GoToPreviousVertex" failureProbability="0.3" time="3" />
+  <Case id="4" failureBehaviour="StayInCurrentVertex" failureProbability="0.1" timeDistribution="Normal" />
+</TestCases>
