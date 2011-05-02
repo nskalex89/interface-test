@@ -1,22 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<RouteList>
-  <Route id="1">
+<?xml version="1.0" encoding="utf-8" ?>
+<routeList>
+  <route id="1">
     <vertex id="1" />
     <vertex id="5" />
-  </Route>
-  <Route id="2">
+  </route>
+  <route id="2">
     <vertex id="1" />
     <vertex id="2" />
     <vertex id="4" />
-  </Route>
-  <Route id="3">
+  </route>
+  <route id="3">
     <vertex id="1" />
     <vertex id="2" />
     <vertex id="3" />
-  </Route>
-  <Route id="4">
+  </route>
+  <route id="4">
     <vertex id="1" />
     <vertex id="5" />
     <vertex id="4" />
-  </Route>
-</RouteList>
+  </route>
+</routeList>
