@@ -1,23 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <testCases>
-    <case failureBehaviour="StayInCurrentVertex" failureDistribution="Normal" timeDistribution="Normal">
-        <selectionProbability routeId="1" value="0.2"/>
-        <selectionProbability routeId="2" value="0.3"/>
-        <selectionProbability routeId="3" value="0.4"/>
+    <case failureBehaviour="StayOnCurrentVertex" failureDistribution="Exp" timeDistribution="Normal">
+        <selectionProbability value="0.2"/>
+        <selectionProbability value="0.3"/>
+        <selectionProbability value="0.4"/>
     </case>
     <case failureBehaviour="GoToFirstVertex" failureDistribution="Normal" time="5">
-        <selectionProbability routeId="1" value="0.2"/>
-        <selectionProbability routeId="2" value="0.2"/>
-        <selectionProbability routeId="3" value="0.3"/>
+        <selectionProbability value="0.2"/>
+        <selectionProbability value="0.2"/>
+        <selectionProbability value="0.3"/>
     </case>
     <case failureBehaviour="GoToPreviousVertex" failureProbability="0.3" time="3">
-        <selectionProbability routeId="1" value="0.1"/>
-        <selectionProbability routeId="2" value="0.3"/>
-        <selectionProbability routeId="3" value="0.2"/>
+        <selectionProbability value="0.1"/>
+        <selectionProbability value="0.3"/>
+        <selectionProbability value="0.2"/>
     </case>
     <case failureBehaviour="StayInCurrentVertex" failureProbability="0.1" timeDistribution="Normal">
-        <selectionProbability routeId="1" value="0.2"/>
-        <selectionProbability routeId="2" value="0.3"/>
-        <selectionProbability routeId="3" value="0.1"/>
+        <selectionProbability value="0.2"/>
+        <selectionProbability value="0.3"/>
+        <selectionProbability value="0.1"/>
     </case>
 </testCases>
