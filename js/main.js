@@ -1,21 +1,35 @@
-function getNormalDistributedNumber() {
-    var mean = 1;
-    var sd = 1;
+function getNormalDistributedNumber(mean, sd) {
     var G = (Math.random() * 2 - 1) + (Math.random() * 2 - 1) + (Math.random() * 2 - 1);
     return Math.abs(G * sd + mean);
 }
 
-function getRoute(r) {
-    var len = selectionProbability.length;
+function getRoute(r, sp) {
+    var len = sp.length;
     var intervalDivides = new Array(len + 1);
     intervalDivides[0] = 0;
 
     var sum = 0;
     for (var i = 0; i < len; i++) {
-        sum += selectionProbability[i];
+        sum += sp[i];
         intervalDivides[i + 1] = sum;
         if (r > intervalDivides[i] && r < intervalDivides[i + 1]) return i;
     }
+}
+
+function getMax(n) {
+    var max = -Infinity;
+    for (var i = 0; i < n.length; i++) {
+        if (n[i] > max) max = n[i];
+    }
+    return max;
+}
+
+function getMin(n) {
+    var min = Infinity;
+    for (var i = 0; i < n.length; i++) {
+        if (n[i] < min) min = n[i];
+    }
+    return min;
 }
 
 $(document).ready(function() {
@@ -37,7 +51,8 @@ $(document).ready(function() {
 
             var routeCount = routes.length;
             var routeMatrix = new Array(routeCount);
-            var N = 1000;
+            var N = 5000;
+            var solvingTime = new Array(N);
 
             var i = 0;
             routes.each(function() {
@@ -75,7 +90,7 @@ $(document).ready(function() {
 
                 var onFailure = $(this).attr("failureBehaviour");
 
-                selectionProbability = new Array($(this).find("selectionProbability").length + 1);
+                var selectionProbability = new Array($(this).find("selectionProbability").length + 1);
                 var k = 0;
                 var sum = 0;
                 $(this).find("selectionProbability").each(function() {
@@ -88,20 +103,56 @@ $(document).ready(function() {
                 // среднее время решения задачи
                 var averageSolvingTime;
                 sum = 0;
+                var tmp;
+                var qq;
                 for (k = 0; k < N; k++) {
-                    $(routeMatrix[getRoute(Math.random())]).each(function() {
+                    var rt = routeMatrix[getRoute(Math.random(), selectionProbability)];
+                    j = 0;
+                    tmp = 0;
+                    while (j < rt.length) {
                         switch (t) {
                             case "Normal":
-                                sum += getNormalDistributedNumber();
+                                tmp += getNormalDistributedNumber(1, 1);
                                 break;
                             case "Exp":
-                                sum += getNormalDistributedNumber();
+                                tmp += getNormalDistributedNumber(1, 1);
                                 break;
                             default:
-                                sum += Number(t);
+                                tmp += Number(t);
                                 break;
                         }
-                    });
+
+                        switch (q) {
+                            case "Normal":
+                                qq = getNormalDistributedNumber(0, 1) / 3;
+                                break;
+                            case "Exp":
+                                qq = getNormalDistributedNumber(0, 1) / 3;
+                                break;
+                            default:
+                                qq = Number(q);
+                                break;
+                        }
+
+                        // произошла ошибка
+                        if (Math.random() < qq) {
+                            switch (onFailure) {
+                                case "StayOnCurrentVertex":
+                                    continue;
+                                case "GoToFirstVertex":
+                                    j = 0;
+                                    continue;
+                                case "GoToPreviousVertex":
+                                    j--;
+                                    continue;
+                            }
+                        }
+                        else {
+                            j++;
+                        }
+                    }
+                    sum += tmp;
+                    solvingTime[k] = tmp;
                 }
                 averageSolvingTime = (sum / N).toFixed(2);
 
@@ -132,7 +183,7 @@ $(document).ready(function() {
                 $("#selection-probability" + (i + 1) + " tbody").append('<td>№ подтемы</td>');
                 $("#subtopic-average" + (i + 1) + " tbody").append('<tr>');
                 $("#subtopic-average" + (i + 1) + " tbody").append('<td>№ подтемы</td>');
-                var counter = 1;
+                counter = 1;
                 routes.each(function() {
                     $("#selection-probability" + (i + 1) + " tbody").append('<td>' + counter + '</td>');
                     $("#subtopic-average" + (i + 1) + " tbody").append('<td>' + counter + '</td>');
@@ -161,23 +212,85 @@ $(document).ready(function() {
                 $(routeMatrix).each(function() {
                     sum = 0;
                     for (k = 0; k < N; k++) {
-                        $(this).each(function() {
+                        j = 0;
+                        tmp = 0;
+                        while (j < $(this).length) {
                             switch (t) {
                                 case "Normal":
-                                    sum += getNormalDistributedNumber();
+                                    sum += getNormalDistributedNumber(1, 1);
                                     break;
                                 case "Exp":
-                                    sum += getNormalDistributedNumber();
+                                    sum += getNormalDistributedNumber(1, 1);
                                     break;
                                 default:
                                     sum += Number(t);
                                     break;
                             }
-                        });
+
+                            switch (q) {
+                                case "Normal":
+                                    qq = getNormalDistributedNumber(0, 1) / 3;
+                                    break;
+                                case "Exp":
+                                    qq = getNormalDistributedNumber(0, 1) / 3;
+                                    break;
+                                default:
+                                    qq = Number(q);
+                                    break;
+                            }
+
+                            // произошла ошибка
+                            if (Math.random() < qq) {
+                                switch (onFailure) {
+                                    case "StayOnCurrentVertex":
+                                        continue;
+                                    case "GoToFirstVertex":
+                                        j = 0;
+                                        continue;
+                                    case "GoToPreviousVertex":
+                                        j--;
+                                        continue;
+                                }
+                            }
+                            else {
+                                j++;
+                            }
+                        }
                     }
                     $("#subtopic-average" + (i + 1) + " tbody").append('<td>' + (sum / N).toFixed(2) + '</td>');
                 });
                 $("#subtopic-average" + (i + 1) + " tbody").append('</tr>');
+
+                //гистограмма
+                intervalCount = Math.floor(1 + 3.22 * Math.log(N));
+                histData = new Array(intervalCount);
+                var min = getMin(solvingTime);
+                var max = getMax(solvingTime);
+                histStep = (max - min) / intervalCount;
+
+                //st = solvingTime;
+
+                for (k = 0; k < intervalCount; k++) {
+                    histData[k] = new Array(k, 0);
+                }
+
+                counter = 0;
+                for (k = min; k < max; k += histStep) {
+                    for (var j = 0; j < solvingTime.length; j++) {
+                        if (solvingTime[j] >= k && solvingTime[j] <= (k + histStep))
+                            if (counter < intervalCount) histData[counter][1]++;
+                    }
+                    counter++;
+                }
+
+                $.plot($("#chart" + (i + 1)), [
+                    { data: histData, color: "green" }
+                ],
+                {
+                    bars: { show: true, barWidth: 0.9, fill: 0.7 },
+                    xaxis: { ticks: [], autoscaleMargin: 0.02 }
+                });
+
 
                 i++;
             });
@@ -185,5 +298,4 @@ $(document).ready(function() {
     });
 
 //$("h1").html("<b>sdgfdfsggfdsg</b>");
-})
-        ;
+});
