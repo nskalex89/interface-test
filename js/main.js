@@ -3,6 +3,10 @@ function getNormalDistributedNumber(mean, sd) {
     return Math.abs(G * sd + mean);
 }
 
+function getExpDistributedNumber(lambda) {
+    return -(1 / lambda) * Math.log(Math.random());
+}
+
 function getRoute(r, sp) {
     var len = sp.length;
     var intervalDivides = new Array(len + 1);
@@ -115,7 +119,7 @@ $(document).ready(function() {
                                 tmp += getNormalDistributedNumber(1, 1);
                                 break;
                             case "Exp":
-                                tmp += getNormalDistributedNumber(1, 1);
+                                tmp += getExpDistributedNumber(1);
                                 break;
                             default:
                                 tmp += Number(t);
@@ -127,7 +131,7 @@ $(document).ready(function() {
                                 qq = getNormalDistributedNumber(0, 1) / 3;
                                 break;
                             case "Exp":
-                                qq = getNormalDistributedNumber(0, 1) / 3;
+                                qq = getExpDistributedNumber(1) / 3;
                                 break;
                             default:
                                 qq = Number(q);
@@ -171,7 +175,7 @@ $(document).ready(function() {
                         '</table>' +
                         '<table id="selection-probability' + (i + 1) + '"><tbody></tbody></table>' +
                         '</div>' +
-                        '<h3>Среднее время выполнения подтем</h3>' +
+                        '<h3>Среднее время выполнения маршрутов</h3>' +
                         '<table id="subtopic-average' + (i + 1) + '"><tbody></tbody></table>' +
                         '<h3>Среднее время решения задачи</h3>' +
                         '<p>' + averageSolvingTime + '</p>' +
@@ -180,9 +184,9 @@ $(document).ready(function() {
                         '</div>');
 
                 $("#selection-probability" + (i + 1) + " tbody").append('<tr>');
-                $("#selection-probability" + (i + 1) + " tbody").append('<td>№ подтемы</td>');
+                $("#selection-probability" + (i + 1) + " tbody").append('<td>№ маршрута</td>');
                 $("#subtopic-average" + (i + 1) + " tbody").append('<tr>');
-                $("#subtopic-average" + (i + 1) + " tbody").append('<td>№ подтемы</td>');
+                $("#subtopic-average" + (i + 1) + " tbody").append('<td>№ маршрута</td>');
                 counter = 1;
                 routes.each(function() {
                     $("#selection-probability" + (i + 1) + " tbody").append('<td>' + counter + '</td>');
@@ -213,14 +217,13 @@ $(document).ready(function() {
                     sum = 0;
                     for (k = 0; k < N; k++) {
                         j = 0;
-                        tmp = 0;
                         while (j < $(this).length) {
                             switch (t) {
                                 case "Normal":
                                     sum += getNormalDistributedNumber(1, 1);
                                     break;
                                 case "Exp":
-                                    sum += getNormalDistributedNumber(1, 1);
+                                    sum += getExpDistributedNumber(1);
                                     break;
                                 default:
                                     sum += Number(t);
@@ -232,7 +235,7 @@ $(document).ready(function() {
                                     qq = getNormalDistributedNumber(0, 1) / 3;
                                     break;
                                 case "Exp":
-                                    qq = getNormalDistributedNumber(0, 1) / 3;
+                                    qq = getExpDistributedNumber(1) / 3;
                                     break;
                                 default:
                                     qq = Number(q);
@@ -296,6 +299,4 @@ $(document).ready(function() {
             });
         }
     });
-
-//$("h1").html("<b>sdgfdfsggfdsg</b>");
 });

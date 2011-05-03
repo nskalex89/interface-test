@@ -20,4 +20,14 @@
         <selectionProbability value="0.3"/>
         <selectionProbability value="0.1"/>
     </case>
+    <case failureBehaviour="StayInCurrentVertex" failureProbability="Normal" timeDistribution="Exp">
+        <selectionProbability value="0.2"/>
+        <selectionProbability value="0.3"/>
+        <selectionProbability value="0.1"/>
+    </case>
+    <case failureBehaviour="StayInCurrentVertex" failureProbability="Exp" timeDistribution="Exp">
+        <selectionProbability value="0.2"/>
+        <selectionProbability value="0.3"/>
+        <selectionProbability value="0.1"/>
+    </case>
 </testCases>
