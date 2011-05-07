@@ -1,33 +1,47 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <testCases>
-    <case failureBehaviour="StayOnCurrentVertex" failureDistribution="Exp" timeDistribution="Normal">
-        <selectionProbability value="0.2"/>
-        <selectionProbability value="0.3"/>
-        <selectionProbability value="0.4"/>
-    </case>
-    <case failureBehaviour="GoToFirstVertex" failureDistribution="Normal" time="5">
-        <selectionProbability value="0.2"/>
-        <selectionProbability value="0.2"/>
-        <selectionProbability value="0.3"/>
-    </case>
-    <case failureBehaviour="GoToPreviousVertex" failureProbability="0.1" time="3">
-        <selectionProbability value="0.1"/>
-        <selectionProbability value="0.3"/>
-        <selectionProbability value="0.2"/>
-    </case>
-    <case failureBehaviour="StayInCurrentVertex" failureProbability="0.1" timeDistribution="Normal">
-        <selectionProbability value="0.2"/>
-        <selectionProbability value="0.3"/>
-        <selectionProbability value="0.1"/>
-    </case>
-    <case failureBehaviour="StayInCurrentVertex" failureProbability="Normal" timeDistribution="Exp">
-        <selectionProbability value="0.2"/>
-        <selectionProbability value="0.3"/>
-        <selectionProbability value="0.1"/>
-    </case>
-    <case failureBehaviour="StayInCurrentVertex" failureProbability="Exp" timeDistribution="Exp">
-        <selectionProbability value="0.2"/>
-        <selectionProbability value="0.3"/>
-        <selectionProbability value="0.1"/>
+    <case n="1000">
+        <vertices>
+            <vertex id="1" failureBehaviour="GoToFirstVertex">
+                <time distribution="Normal" mean="3" sd="1"/>
+                <failure distribution="Exp" lambda="0.5"/>
+            </vertex>
+            <vertex id="2" failureBehaviour="GoToPreviousVertex">
+                <time distribution="Normal" mean="3" sd="1"/>
+                <failure distribution="Exp" lambda="0.5"/>
+            </vertex>
+            <vertex id="3" failureBehaviour="StayOnCurrentVertex">
+                <time distribution="Normal" mean="3" sd="1"/>
+                <failure distribution="Exp" lambda="0.5"/>
+            </vertex>
+            <vertex id="4" failureBehaviour="StayOnCurrentVertex">
+                <time distribution="Normal" mean="3" sd="1"/>
+                <failure distribution="Exp" lambda="0.5"/>
+            </vertex>
+            <vertex id="5" failureBehaviour="GoToFirstVertex">
+                <time distribution="Normal" mean="3" sd="1"/>
+                <failure distribution="Exp" lambda="0.5"/>
+            </vertex>
+        </vertices>
+
+        <route selectionProbability="0.2">
+            <item vertex="1"/>
+            <item vertex="5"/>
+        </route>
+        <route selectionProbability="0.3">
+            <item vertex="1"/>
+            <item vertex="2"/>
+            <item vertex="4"/>
+        </route>
+        <route selectionProbability="0.4">
+            <item vertex="1"/>
+            <item vertex="2"/>
+            <item vertex="3"/>
+        </route>
+        <route>
+            <item vertex="1"/>
+            <item vertex="5"/>
+            <item vertex="4"/>
+        </route>
     </case>
 </testCases>
