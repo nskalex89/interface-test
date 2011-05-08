@@ -4,7 +4,7 @@ function normalDistribution(mean, sd) {
 }
 
 function expDistribution(lambda) {
-    return -(1 / lambda) * Math.log(Math.random());
+    return Math.abs(-(1 / lambda) * Math.log(Math.random()));
 }
 
 function maxInArray(n) {
@@ -31,6 +31,14 @@ function sumAllArrayElementsExceptLast(n) {
     return sum;
 }
 
+function sumAllArrayElements(n) {
+    var sum = 0;
+    for (var i = 0; i < n.length; i++) {
+        sum += n[i];
+    }
+    return sum;
+}
+
 function printObject(obj) {
     var result = "";
 
@@ -39,6 +47,37 @@ function printObject(obj) {
     }
 
     return result;
+}
+
+function getTime(vertex) {
+    switch (vertex.time.distribution) {
+        case "Constant":
+            return vertex.time.value;
+        case "Normal":
+            return normalDistribution(vertex.time.mean, vertex.time.sd);
+        case "Exp":
+            return expDistribution(vertex.time.lambda);
+    }
+}
+
+function getFailureProbability(vertex) {
+    var epsilon = 0.0001;
+    switch (vertex.failure.distribution) {
+        case "Constant":
+            return vertex.failure.value;
+        case "Normal":
+            return normalDistribution(vertex.failure.mean, vertex.failure.sd) / (3 * vertex.failure.sd);
+        case "Exp":
+            return (expDistribution(vertex.failure.lambda) / (-Math.log(epsilon) / vertex.failure.lambda));
+    }
+}
+
+function getVertexById(id, vertices) {
+    for (var i = 0; i < vertices.length; i++) {
+        if (vertices[i].id == id) {
+            return vertices[i];
+        }
+    }
 }
 
 function getRoute(r, sp) {
@@ -50,6 +89,7 @@ function getRoute(r, sp) {
     for (var i = 0; i < len; i++) {
         sum += sp[i];
         intervalDivides[i + 1] = sum;
+
         if (r > intervalDivides[i] && r < intervalDivides[i + 1]) return i;
     }
 }
@@ -67,6 +107,8 @@ $(document).ready(function() {
                 var selectionProbabilities;
                 var routes;
                 var vertices;
+                var solvingTime = new Array(n);
+                var averageSolvingTime;
 
                 caseCounter++;
 
@@ -82,9 +124,9 @@ $(document).ready(function() {
                         '<table id="vertices' + caseCounter + '"><tbody><tr><td>Вершина</td><td>t</td><td>q</td><td>При ошибке</td></tr></tbody></table>' +
                         '</div>' +
                         '<h3>Среднее время выполнения маршрутов</h3>' +
-                        '<table id="route-performing-average' + caseCounter + '"><tbody></tbody></table>' +
+                        '<table id="route-performing-average' + caseCounter + '"><tbody><tr id="rn"><td>№ маршрута</td></tr><tr id="pt"><td>t<sub>ср</sub></td></tr></tbody></table>' +
                         '<h3>Среднее время решения задачи</h3>' +
-                        '<p id="average-solving-time"' + caseCounter + '></p>' +
+                        '<p id="average-solving-time' + caseCounter + '"></p>' +
                         '<h3>Гистограмма для времени решения задачи</h3>' +
                         '<div class="chart" id="chart' + caseCounter + '"></div>' +
                         '</div>');
@@ -100,12 +142,12 @@ $(document).ready(function() {
                     // если текущий маршрут последний и не является единственным
                     if (routeCounter == routeNumber && routeNumber != 1) {
                         selectionProbabilities[routeCounter - 1] =
-                                (1 - sumAllArrayElementsExceptLast(selectionProbabilities)).toPrecision(2);
+                                Number(1 - sumAllArrayElementsExceptLast(selectionProbabilities));
                     } else {
                         selectionProbabilities[routeCounter - 1] = parseFloat($(this).attr("selectionProbability"));
                     }
                     $("#selection-probability" + caseCounter + " #rn").append("<td>" + routeCounter + "</td>");
-                    $("#selection-probability" + caseCounter + " #sp").append("<td>" + selectionProbabilities[routeCounter - 1] + "</td>");
+                    $("#selection-probability" + caseCounter + " #sp").append("<td>" + selectionProbabilities[routeCounter - 1].toFixed(2) + "</td>");
 
                     $("#route-matrix" + caseCounter + " tbody").append('<tr id="r' + routeCounter + '"></tr>');
 
@@ -120,7 +162,7 @@ $(document).ready(function() {
                                 routes[routeCounter - 1][itemCount - 1] + "</td>");
                     });
                 });
-                
+
                 // параметры вершин
                 vertices = new Array($(this).find("vertex").length);
                 var vertexCount = 0;
@@ -165,252 +207,109 @@ $(document).ready(function() {
                             '<td>' + vertices[vertexCount - 1].failureBehaviour + '</td>' +
                             '</tr>');
                 });
-            });
 
-//            var routeCount = routes.length;
-//            var routeMatrix = new Array(routeCount);
-//            var n = 5000;
-//            var solvingTime = new Array(n);
-//
-//            var i = 0;
-//            routes.each(function() {
-//                var vertexCount = $(this).find("vertex").length;
-//
-//                $("#root-matrix tbody").append('<tr>');
-//                routeMatrix[i] = new Array(vertexCount);
-//                var j = 0;
-//                $(this).find("vertex").each(function() {
-//                    $("#root-matrix tbody").append('<td>' + $(this).attr("id") + '</td>');
-//                    routeMatrix[i][j] = parseFloat($(this).attr("id"));
-//                    j++;
-//                });
-//                $("#root-matrix tbody").append('</tr>');
-//                i++;
-//            });
-//
-//            i = 0;
-//            cases.each(function() {
-//                var t;
-//                if ($(this).attr("time") != null) {
-//                    t = $(this).attr("time");
-//                }
-//                else {
-//                    t = $(this).attr("timeDistribution");
-//                }
-//
-//                var q;
-//                if ($(this).attr("failureProbability") != null) {
-//                    q = $(this).attr("failureProbability");
-//                }
-//                else {
-//                    q = $(this).attr("failureDistribution");
-//                }
-//
-//                var onFailure = $(this).attr("failureBehaviour");
-//
-//                var selectionProbability = new Array($(this).find("selectionProbability").length + 1);
-//                var k = 0;
-//                var sum = 0;
-//                $(this).find("selectionProbability").each(function() {
-//                    sum += parseFloat($(this).attr("value"));
-//                    selectionProbability[k] = parseFloat($(this).attr("value"));
-//                    k++;
-//                });
-//                selectionProbability[k] = 1 - sum;
-//
-//                // среднее время решения задачи
-//                var averageSolvingTime;
-//                sum = 0;
-//                var tmp;
-//                var qq;
-//                for (k = 0; k < n; k++) {
-//                    var rt = routeMatrix[getRoute(Math.random(), selectionProbability)];
-//                    j = 0;
-//                    tmp = 0;
-//                    while (j < rt.length) {
-//                        switch (t) {
-//                            case "Normal":
-//                                tmp += normalDistribution(1, 1);
-//                                break;
-//                            case "Exp":
-//                                tmp += expDistribution(1);
-//                                break;
-//                            default:
-//                                tmp += Number(t);
-//                                break;
-//                        }
-//
-//                        switch (q) {
-//                            case "Normal":
-//                                qq = normalDistribution(0, 1) / 3;
-//                                break;
-//                            case "Exp":
-//                                qq = expDistribution(1) / 3;
-//                                break;
-//                            default:
-//                                qq = Number(q);
-//                                break;
-//                        }
-//
-//                        // произошла ошибка
-//                        if (Math.random() < qq) {
-//                            switch (onFailure) {
-//                                case "StayOnCurrentVertex":
-//                                    continue;
-//                                case "GoToFirstVertex":
-//                                    j = 0;
-//                                    continue;
-//                                case "GoToPreviousVertex":
-//                                    j--;
-//                                    continue;
-//                            }
-//                        }
-//                        else {
-//                            j++;
-//                        }
-//                    }
-//                    sum += tmp;
-//                    solvingTime[k] = tmp;
-//                }
-//                averageSolvingTime = (sum / n).toFixed(2);
-//
-//                $("div.main").append('<div class="container" id="container' + (i + 1) + '">' +
-//                        '<h2>Тест №' + (i + 1) + '</h2>' +
-//                        '<div class="input-data" id="input-data' + (i + 1) + '">' +
-//                        '<table>' +
-//                        '<tbody>' +
-//                        '<tr>' +
-//                        '<td>t</td><td>q</td><td>При ошибке</td>' +
-//                        '</tr>' +
-//                        '<tr>' +
-//                        '<td>' + t + '</td><td>' + q + '</td><td>' + onFailure + '</td>' +
-//                        '</tr>' +
-//                        '</tbody>' +
-//                        '</table>' +
-//                        '<table id="selection-probability' + (i + 1) + '"><tbody></tbody></table>' +
-//                        '</div>' +
-//                        '<h3>Среднее время выполнения маршрутов</h3>' +
-//                        '<table id="subtopic-average' + (i + 1) + '"><tbody></tbody></table>' +
-//                        '<h3>Среднее время решения задачи</h3>' +
-//                        '<p>' + averageSolvingTime + '</p>' +
-//                        '<h3>Гистограмма для времени решения задачи</h3>' +
-//                        '<div class="chart" id="chart' + (i + 1) + '"></div>' +
-//                        '</div>');
-//
-//                $("#selection-probability" + (i + 1) + " tbody").append('<tr>');
-//                $("#selection-probability" + (i + 1) + " tbody").append('<td>№ маршрута</td>');
-//                $("#subtopic-average" + (i + 1) + " tbody").append('<tr>');
-//                $("#subtopic-average" + (i + 1) + " tbody").append('<td>№ маршрута</td>');
-//                counter = 1;
-//                routes.each(function() {
-//                    $("#selection-probability" + (i + 1) + " tbody").append('<td>' + counter + '</td>');
-//                    $("#subtopic-average" + (i + 1) + " tbody").append('<td>' + counter + '</td>');
-//                    counter++;
-//                });
-//                $("#selection-probability" + (i + 1) + " tbody").append('</tr>');
-//                $("#subtopic-average" + (i + 1) + " tbody").append('</tr>');
-//
-//                $("#selection-probability" + (i + 1) + " tbody").append('<tr>');
-//                $("#selection-probability" + (i + 1) + " tbody").append('<td>P<sub>выбора</sub></td>');
-//                sum = 0;
-//                k = 0;
-//                $(this).find("selectionProbability").each(function() {
-//                    sum += parseFloat($(this).attr("value"));
-//                    $("#selection-probability" + (i + 1) + " tbody").append('<td>' + $(this).attr("value") + '</td>');
-//                    selectionProbability[k] = parseFloat($(this).attr("value"));
-//                    k++;
-//                });
-//                $("#selection-probability" + (i + 1) + " tbody").append('<td>' + (1 - sum).toFixed(2) + '</td>');
-//                $("#selection-probability" + (i + 1) + " tbody").append('</tr>');
-//                selectionProbability[k] = 1 - sum;
-//
-//                // среднее время выполнения подтем
-//                $("#subtopic-average" + (i + 1) + " tbody").append('<tr>');
-//                $("#subtopic-average" + (i + 1) + " tbody").append('<td>t<sub>ср</sub></td>');
-//                $(routeMatrix).each(function() {
-//                    sum = 0;
-//                    for (k = 0; k < n; k++) {
-//                        j = 0;
-//                        while (j < $(this).length) {
-//                            switch (t) {
-//                                case "Normal":
-//                                    sum += normalDistribution(1, 1);
-//                                    break;
-//                                case "Exp":
-//                                    sum += expDistribution(1);
-//                                    break;
-//                                default:
-//                                    sum += Number(t);
-//                                    break;
-//                            }
-//
-//                            switch (q) {
-//                                case "Normal":
-//                                    qq = normalDistribution(0, 1) / 3;
-//                                    break;
-//                                case "Exp":
-//                                    qq = expDistribution(1) / 3;
-//                                    break;
-//                                default:
-//                                    qq = Number(q);
-//                                    break;
-//                            }
-//
-//                            // произошла ошибка
-//                            if (Math.random() < qq) {
-//                                switch (onFailure) {
-//                                    case "StayOnCurrentVertex":
-//                                        continue;
-//                                    case "GoToFirstVertex":
-//                                        j = 0;
-//                                        continue;
-//                                    case "GoToPreviousVertex":
-//                                        j--;
-//                                        continue;
-//                                }
-//                            }
-//                            else {
-//                                j++;
-//                            }
-//                        }
-//                    }
-//                    $("#subtopic-average" + (i + 1) + " tbody").append('<td>' + (sum / n).toFixed(2) + '</td>');
-//                });
-//                $("#subtopic-average" + (i + 1) + " tbody").append('</tr>');
-//
-//                //гистограмма
-//                intervalCount = Math.floor(1 + 3.22 * Math.log(n));
-//                histData = new Array(intervalCount);
-//                var min = minInArray(solvingTime);
-//                var max = maxInArray(solvingTime);
-//                histStep = (max - min) / intervalCount;
-//
-//                //st = solvingTime;
-//
-//                for (k = 0; k < intervalCount; k++) {
-//                    histData[k] = new Array(k, 0);
-//                }
-//
-//                counter = 0;
-//                for (k = min; k < max; k += histStep) {
-//                    for (var j = 0; j < solvingTime.length; j++) {
-//                        if (solvingTime[j] >= k && solvingTime[j] <= (k + histStep))
-//                            if (counter < intervalCount) histData[counter][1]++;
-//                    }
-//                    counter++;
-//                }
-//
-//                $.plot($("#chart" + (i + 1)), [
-//                    { data: histData, color: "green" }
-//                ],
-//                {
-//                    bars: { show: true, barWidth: 0.9, fill: 0.7 },
-//                    xaxis: { ticks: [], autoscaleMargin: 0.02 }
-//                });
-//
-//
-//                i++;
-//            });
+                //среднее время выполнения маршрутов
+                var routeCount = 0;
+                $(routes).each(function() {
+                    var sum = 0;
+
+                    routeCount++;
+
+                    for (var i = 0; i < n; i++) {
+                        var vertexNumber = 0;
+
+                        // обход вершин в маршруте
+                        for (var j = 0; j < this.length; j++) {
+                            //debugger;
+                            var vertex = getVertexById(this[j], vertices);
+                            sum += getTime(vertex);
+
+                            var failurePtrobability = getFailureProbability(vertex);
+                            // произошла ошибка
+                            if (failurePtrobability > Math.random()) {
+                                switch (vertex.failureBehaviour) {
+                                    case "StayOnCurrentVertex":
+                                        continue;
+                                    case "GoToPreviousVertex":
+                                        vertexNumber--;
+                                        continue;
+                                    case "GoToFirstVertex":
+                                        vertexNumber = 0;
+                                        continue;
+                                }
+                            } else {
+                                vertexNumber++;
+                            }
+                        }
+                    }
+                    $("#route-performing-average" + caseCounter + " #rn").append("<td>" + routeCount + "</td>");
+                    $("#route-performing-average" + caseCounter + " #pt").append("<td>" + (sum / n).toFixed(2) + "</td>");
+                });
+
+                // заполнение solvingTime
+                for (var i = 0; i < n; i++) {
+                    var tmp = 0;
+                    // выбор маршрута
+                    var route = routes[getRoute(Math.random(), selectionProbabilities)];
+
+                    // обход вершин в маршруте
+                    var vertexNumber = 0;
+                    for (var j = 0; j < route.length; j++) {
+                        var vertex = getVertexById(route[j], vertices);
+                        tmp += getTime(vertex);
+
+                        var failurePtrobability = getFailureProbability(vertex);
+                        // произошла ошибка
+                        if (failurePtrobability > Math.random()) {
+                            switch (vertex.failureBehaviour) {
+                                case "StayOnCurrentVertex":
+                                    continue;
+                                case "GoToPreviousVertex":
+                                    vertexNumber--;
+                                    continue;
+                                case "GoToFirstVertex":
+                                    vertexNumber = 0;
+                                    continue;
+                            }
+                        } else {
+                            vertexNumber++;
+                        }
+                    }
+                    solvingTime[i] = tmp;
+                }
+
+                // среднее время решения задачи
+                averageSolvingTime = sumAllArrayElements(solvingTime) / n;
+                $("#average-solving-time" + caseCounter).append(averageSolvingTime.toFixed(2));
+
+                // гистограмма
+                var intervalCount = Math.floor(1 + 3.22 * Math.log(n));
+                var histData = new Array(intervalCount);
+                var min = minInArray(solvingTime);
+                var max = maxInArray(solvingTime);
+                var histStep = (max - min) / intervalCount;
+
+                for (var i = 0; i < intervalCount; i++) {
+                    histData[i] = new Array(i, 0);
+                }
+
+                var counter = 0;
+                for (var i = min; i < max; i += histStep) {
+                    for (var j = 0; j < solvingTime.length; j++) {
+                        if (solvingTime[j] >= i && solvingTime[j] <= (i + histStep))
+                            if (counter < intervalCount) histData[counter][1]++;
+                    }
+                    counter++;
+                }
+
+                $.plot($("#chart" + caseCounter), [
+                    { data: histData, color: "green" }
+                ],
+                {
+                    bars: { show: true, barWidth: 0.9, fill: 0.7 },
+                    xaxis: { ticks: [], autoscaleMargin: 0.02 }
+                });
+            });
         }
     });
 });

@@ -1,13 +1,58 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <testCases>
-    <case n="1000">
+    <case n="2000">
         <vertices>
             <vertex id="1" failureBehaviour="GoToFirstVertex">
                 <time distribution="Normal" mean="3" sd="1"/>
                 <failure distribution="Exp" lambda="0.5"/>
             </vertex>
             <vertex id="2" failureBehaviour="GoToPreviousVertex">
+                <time distribution="Constant" value="3"/>
+                <failure distribution="Exp" lambda="0.5"/>
+            </vertex>
+            <vertex id="3" failureBehaviour="StayOnCurrentVertex">
                 <time distribution="Normal" mean="3" sd="1"/>
+                <failure distribution="Exp" lambda="0.5"/>
+            </vertex>
+            <vertex id="4" failureBehaviour="StayOnCurrentVertex">
+                <time distribution="Normal" mean="3" sd="1"/>
+                <failure distribution="Exp" lambda="0.5"/>
+            </vertex>
+            <vertex id="5" failureBehaviour="GoToFirstVertex">
+                <time distribution="Normal" mean="3" sd="1"/>
+                <failure distribution="Exp" lambda="0.5"/>
+            </vertex>
+        </vertices>
+
+        <route selectionProbability="0.5">
+            <item vertex="1"/>
+            <item vertex="5"/>
+        </route>
+        <route selectionProbability="0.1">
+            <item vertex="1"/>
+            <item vertex="2"/>
+            <item vertex="4"/>
+        </route>
+        <route selectionProbability="0.2">
+            <item vertex="1"/>
+            <item vertex="2"/>
+            <item vertex="3"/>
+        </route>
+        <route>
+            <item vertex="1"/>
+            <item vertex="5"/>
+            <item vertex="4"/>
+        </route>
+    </case>
+
+    <case n="5000">
+        <vertices>
+            <vertex id="1" failureBehaviour="GoToPreviousVertex">
+                <time distribution="Normal" mean="3" sd="1"/>
+                <failure distribution="Constant" value="0.5"/>
+            </vertex>
+            <vertex id="2" failureBehaviour="GoToPreviousVertex">
+                <time distribution="Constant" value="3"/>
                 <failure distribution="Exp" lambda="0.5"/>
             </vertex>
             <vertex id="3" failureBehaviour="StayOnCurrentVertex">
